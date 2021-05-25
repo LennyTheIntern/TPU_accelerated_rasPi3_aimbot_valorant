@@ -11,8 +11,7 @@
 #
 # I added my own method of drawing boxes and labels using OpenCV.
 
-
-
+#includes 
 import os
 import argparse
 import cv2
@@ -21,6 +20,10 @@ import sys
 import time
 from threading import Thread
 import importlib.util
+
+center_x = 160 #center fo the screen
+center_y = 160 #center of the screen
+
 
 # Define VideoStream class to handle streaming of video from webcam in separate processing thread
 # Source - Adrian Rosebrock, PyImageSearch: https://www.pyimagesearch.com/2015/12/28/increasing-raspberry-pi-fps-with-python-and-opencv/
@@ -63,6 +66,19 @@ class VideoStream:
     def stop(self):
 	# Indicate that the camera and thread should be stopped
         self.stopped = True
+
+def mouse_move(x,y):
+    move_x = x-center_x
+    move_y = y-center_y
+    try:
+        bus.write_byte(addr,move_x >> 0)
+        bus.write_byte(addr,move_x >> 8)
+        bus.write_byte(addr,move_y >> 0)
+        bus.write_byte(addr,move_y >> 8)
+    except:
+        print("lost a mouse move")
+
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--modeldir', help='Folder the .tflite file is located in',
@@ -205,6 +221,18 @@ while True:
                 
                 cv2.rectangle(frame, (xmin,ymin), (xmax,ymax), (10, 255, 0), 2)
 
+                #roi_frame = frame[ymin:ymax, xmin:xmax]
+                #hsv_roi_frame = cv2.cvtColor(roi_frame,cv2.COLOR_BGR2HSV)
+                
+                roi_frame = cv2.cvtColor(frame[ymin:ymax, xmin:xmax],cv2.COLOR_BGR2HSV)
+                mask = cv2.inRange(roi_frame,lower,upper)
+                enemy_pixel_count = cv2.CountNonZero(mask)
+
+                if(enemy_pixel_count > 10):
+                    {
+                        mouse_move(xmin,ymin)
+                    }
+
                 # Draw label
                 object_name = labels[int(classes[i])] # Look up object name from "labels" array using class index
                 label = '%s: %d%%' % (object_name, int(scores[i]*100)) # Example: 'person: 72%'
@@ -214,3 +242,21 @@ while True:
                 cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2) # Draw label text
 
 
+                 # Draw framerate in corner of frame
+    cv2.putText(frame,'FPS: {0:.2f}'.format(frame_rate_calc),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,0),2,cv2.LINE_AA)
+
+    # All the results have been drawn on the frame, so it's time to display it.
+    cv2.imshow('Object detector', frame)
+
+    # Calculate framerate
+    t2 = cv2.getTickCount()
+    time1 = (t2-t1)/freq
+    frame_rate_calc= 1/time1
+
+    # Press 'q' to quit
+    if cv2.waitKey(1) == ord('q'):
+        break
+
+# Clean up
+cv2.destroyAllWindows()
+videostream.stop()
