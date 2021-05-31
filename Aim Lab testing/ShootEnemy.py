@@ -20,7 +20,15 @@ import sys
 import time
 from threading import Thread
 import importlib.util
+import serial
+from time import sleep
+from smbus import SMBus
 
+addr = 0x8
+bus = SMBus(1)
+numb = 11234
+center_offset_x = -10
+center_offset_y = -10
 center_x = 160 #center fo the screen
 center_y = 160 #center of the screen
 
@@ -67,9 +75,10 @@ class VideoStream:
 	# Indicate that the camera and thread should be stopped
         self.stopped = True
 
-def mouse_move(x,y):
-    move_x = x-center_x
-    move_y = y-center_y
+def mouse_move(x,y,xmax,ymax):
+    move_x = x-center_x + ((xmax- x) >> 1)
+    move_y = y-center_y + ((ymax -y) >> 2)
+    print("move")
     try:
         bus.write_byte(addr,move_x >> 0)
         bus.write_byte(addr,move_x >> 8)
@@ -172,13 +181,13 @@ imW = 320
 imH = 320
 
 #HSV mins for color detection
-hmin = 130
-smin = 166
+hmin = 107
+smin = 118
 vmin = 0
 #HSV max for color detection 
 hmax = 179
 smax = 255
-vmax = 255
+vmax = 224
 #initialize the HSV values for detecting the outline
 lower = np.array([hmin,smin,vmin])
 upper = np.array([hmax,smax,vmax])
@@ -226,11 +235,15 @@ while True:
                 
                 roi_frame = cv2.cvtColor(frame[ymin:ymax, xmin:xmax],cv2.COLOR_BGR2HSV)
                 mask = cv2.inRange(roi_frame,lower,upper)
-                enemy_pixel_count = cv2.CountNonZero(mask)
-
-                if(enemy_pixel_count > 10):
+                enemy_pixel_count = cv2.countNonZero(mask)
+                cv2.imshow('Object ', mask)
+                
+                print(enemy_pixel_count / ((ymax - ymin) * (xmax -xmin)))
+                if(0.01 < enemy_pixel_count / ((ymax - ymin) * (xmax -xmin)) ):
                     {
-                        mouse_move(xmin,ymin)
+                        mouse_move(xmin,ymin,xmax,ymax)
+                        
+                        #print(enemy_pixel_count)
                     }
 
                 # Draw label
