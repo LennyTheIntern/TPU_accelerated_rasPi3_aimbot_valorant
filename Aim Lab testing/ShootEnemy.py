@@ -181,13 +181,13 @@ imW = 320
 imH = 320
 
 #HSV mins for color detection
-hmin = 107
-smin = 118
+hmin = 130
+smin = 166
 vmin = 0
 #HSV max for color detection 
 hmax = 179
-smax = 255
-vmax = 224
+smax = 180
+vmax = 255
 #initialize the HSV values for detecting the outline
 lower = np.array([hmin,smin,vmin])
 upper = np.array([hmax,smax,vmax])
@@ -195,7 +195,7 @@ upper = np.array([hmax,smax,vmax])
 
 
 # Initialize video stream
-videostream = VideoStream(resolution=(imW,imH),framerate=4).start()
+videostream = VideoStream(resolution=(imW,imH),framerate=8).start()
 time.sleep(1)
 
 while True:
@@ -220,9 +220,10 @@ while True:
 
     for i in range(len(scores)):
         if ((scores[i] > min_conf_threshold) and (scores[i] <= 1.0)):
-            if (labels[int(classes[i])] == 'person'):
+            if (labels[int(classes[i])] == 'person' ):
                 # Get bounding box coordinates and draw box
                 # Interpreter can return coordinates that are outside of image dimensions, need to force them to be within image using max() and min()
+                
                 ymin = int(max(1,(boxes[i][0] * imH)))
                 xmin = int(max(1,(boxes[i][1] * imW)))
                 ymax = int(min(imH,(boxes[i][2] * imH)))
