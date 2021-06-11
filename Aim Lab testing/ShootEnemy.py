@@ -180,6 +180,7 @@ freq = cv2.getTickFrequency()
 imW = 320
 imH = 320
 
+###these values can be changed for different colors, use "coloe_calibrator.py" to test a new range of values
 #HSV mins for color detection
 hmin = 130
 smin = 166
@@ -191,9 +192,13 @@ vmax = 255
 #initialize the HSV values for detecting the outline
 lower = np.array([hmin,smin,vmin])
 upper = np.array([hmax,smax,vmax])
-
-
-
+#mere is mask and the mask values for blocking the arm from the detection
+#br_stands for botom right
+x_br_mask = 240
+w_br_mask = 80
+y_br_mask = 240
+h_br_mask = 80
+br_mask = np.zeros[0:imH, 0:imW]
 # Initialize video stream
 videostream = VideoStream(resolution=(imW,imH),framerate=8).start()
 time.sleep(1)
@@ -205,6 +210,7 @@ while True:
     # Grab frame from video stream
     frame1 = videostream.read()
     frame = frame1.copy()
+    frame[x_br_mask:w_br_mask + x_br_mask,y_br_mask:h_br_mask + y_br_mask] = br_mask[y_br_mask: y_br_mask + h_br_mask, x_br_mask:x_br_mask + h_br_mask]
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     frame_resized = cv2.resize(frame_rgb, (width, height))
     input_data = np.expand_dims(frame_resized, axis=0)
@@ -218,6 +224,8 @@ while True:
     classes = interpreter.get_tensor(output_details[1]['index'])[0] # Class index of detected objects
     scores = interpreter.get_tensor(output_details[2]['index'])[0] # Confidence of detected objects
 
+
+# TODO: add logic for shooting only the closest enemy
     for i in range(len(scores)):
         if ((scores[i] > min_conf_threshold) and (scores[i] <= 1.0)):
             if (labels[int(classes[i])] == 'person' ):
@@ -243,7 +251,6 @@ while True:
                 if(0.01 < enemy_pixel_count / ((ymax - ymin) * (xmax -xmin)) ):
                     {
                         mouse_move(xmin,ymin,xmax,ymax)
-                        
                         #print(enemy_pixel_count)
                     }
 
