@@ -226,21 +226,21 @@ while True:
 
 
 # TODO: add logic for shooting only the closest enemy
+    detection = False
+    cord_list = []
     for i in range(len(scores)):
         if ((scores[i] > min_conf_threshold) and (scores[i] <= 1.0)):
             if (labels[int(classes[i])] == 'person' ):
+                detection = True
                 # Get bounding box coordinates and draw box
                 # Interpreter can return coordinates that are outside of image dimensions, need to force them to be within image using max() and min()
-                
-                ymin = int(max(1,(boxes[i][0] * imH)))
+                temp_cord = [int(max(1,(boxes[i][0] * imH))),int(max(1,(boxes[i][1] * imW))),int(min(imH,(boxes[i][2] * imH))),int(min(imW,(boxes[i][3] * imW)))]
+                ymin = int(max(1,(boxes[i][0] * imH))) # temp_cord[1]
                 xmin = int(max(1,(boxes[i][1] * imW)))
                 ymax = int(min(imH,(boxes[i][2] * imH)))
                 xmax = int(min(imW,(boxes[i][3] * imW)))
                 
                 cv2.rectangle(frame, (xmin,ymin), (xmax,ymax), (10, 255, 0), 2)
-
-                #roi_frame = frame[ymin:ymax, xmin:xmax]
-                #hsv_roi_frame = cv2.cvtColor(roi_frame,cv2.COLOR_BGR2HSV)
                 
                 roi_frame = cv2.cvtColor(frame[ymin:ymax, xmin:xmax],cv2.COLOR_BGR2HSV)
                 mask = cv2.inRange(roi_frame,lower,upper)
@@ -250,7 +250,7 @@ while True:
                 print(enemy_pixel_count / ((ymax - ymin) * (xmax -xmin)))
                 if(0.01 < enemy_pixel_count / ((ymax - ymin) * (xmax -xmin)) ):
                     {
-                        mouse_move(xmin,ymin,xmax,ymax)
+                        cord_list.append(temp_cord)
                         #print(enemy_pixel_count)
                     }
 
@@ -261,6 +261,11 @@ while True:
                 label_ymin = max(ymin, labelSize[1] + 10) # Make sure not to draw label too close to top of window
                 cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10), (xmin+labelSize[0], label_ymin+baseLine-10), (255, 255, 255), cv2.FILLED) # Draw white box to put label text in
                 cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2) # Draw label text
+    if detection:
+        # do i really need to sort the list ? i just want the max
+        #cord_list = sorted(cord_list, key=lambda v: np.sqrt(pow((v[0] - [160]), 2) + pow((v[1] - [160]), 2)))
+        cord_closest = min(cord_list,key=lambda v:np.sqrt(pow((v[0] - [160]), 2) + pow((v[1] - [160]), 2)))
+        mouse_move(cord_list[0][0], cord_list[0][1], cord_list[0][2], cord_list[0][3])
 
 
                  # Draw framerate in corner of frame
