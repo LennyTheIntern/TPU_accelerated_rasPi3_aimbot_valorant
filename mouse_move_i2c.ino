@@ -69,6 +69,7 @@ void mouse_move(int16_t x, int16_t y )
   int16_t mouse_y = 0;
   bool yflag = false;
   bool xflag = false;
+  /// this if state ment needs some work
   while( !yflag || !xflag )//
   {
     if( x > 127)// what if the value is negitive
