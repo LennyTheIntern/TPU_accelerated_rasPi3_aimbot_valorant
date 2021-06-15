@@ -198,7 +198,7 @@ x_br_mask = 240
 w_br_mask = 80
 y_br_mask = 240
 h_br_mask = 80
-br_mask = np.zeros[0:imH, 0:imW]
+br_mask = np.zeros((320, 320),np.float32)
 # Initialize video stream
 videostream = VideoStream(resolution=(imW,imH),framerate=8).start()
 time.sleep(1)
@@ -210,7 +210,8 @@ while True:
     # Grab frame from video stream
     frame1 = videostream.read()
     frame = frame1.copy()
-    frame[x_br_mask:w_br_mask + x_br_mask,y_br_mask:h_br_mask + y_br_mask] = br_mask[y_br_mask: y_br_mask + h_br_mask, x_br_mask:x_br_mask + h_br_mask]
+    br_mask = np.zeros(frame.shape,np.uint8)
+    frame[x_br_mask:w_br_mask + x_br_mask, y_br_mask:h_br_mask + y_br_mask] = br_mask[x_br_mask:w_br_mask + x_br_mask, y_br_mask:h_br_mask + y_br_mask] 
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     frame_resized = cv2.resize(frame_rgb, (width, height))
     input_data = np.expand_dims(frame_resized, axis=0)
@@ -231,15 +232,15 @@ while True:
     for i in range(len(scores)):
         if ((scores[i] > min_conf_threshold) and (scores[i] <= 1.0)):
             if (labels[int(classes[i])] == 'person' ):
-                detection = True
+                
                 # Get bounding box coordinates and draw box
                 # Interpreter can return coordinates that are outside of image dimensions, need to force them to be within image using max() and min()
-                temp_cord = [int(max(1,(boxes[i][0] * imH))),int(max(1,(boxes[i][1] * imW))),int(min(imH,(boxes[i][2] * imH))),int(min(imW,(boxes[i][3] * imW)))]
+                #temp_cord = [int(max(1,(boxes[i][0] * imH))),int(max(1,(boxes[i][1] * imW))),int(min(imH,(boxes[i][2] * imH))),int(min(imW,(boxes[i][3] * imW)))]
                 ymin = int(max(1,(boxes[i][0] * imH))) # temp_cord[1]
                 xmin = int(max(1,(boxes[i][1] * imW)))
                 ymax = int(min(imH,(boxes[i][2] * imH)))
                 xmax = int(min(imW,(boxes[i][3] * imW)))
-                
+
                 cv2.rectangle(frame, (xmin,ymin), (xmax,ymax), (10, 255, 0), 2)
                 
                 roi_frame = cv2.cvtColor(frame[ymin:ymax, xmin:xmax],cv2.COLOR_BGR2HSV)
@@ -247,11 +248,14 @@ while True:
                 enemy_pixel_count = cv2.countNonZero(mask)
                 cv2.imshow('Object ', mask)
                 
-                print(enemy_pixel_count / ((ymax - ymin) * (xmax -xmin)))
+                detection = True
+                cord_list.append((ymin,xmin,ymax,xmax))
+                
+                #print(enemy_pixel_count / ((ymax - ymin) * (xmax -xmin)))
+                #print([ymin,xmin,ymax,xmax])
                 if(0.01 < enemy_pixel_count / ((ymax - ymin) * (xmax -xmin)) ):
                     {
-                        cord_list.append(temp_cord)
-                        #print(enemy_pixel_count)
+                       
                     }
 
                 # Draw label
@@ -262,10 +266,12 @@ while True:
                 cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10), (xmin+labelSize[0], label_ymin+baseLine-10), (255, 255, 255), cv2.FILLED) # Draw white box to put label text in
                 cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2) # Draw label text
     if detection:
+        #print(cord_list)
         # do i really need to sort the list ? i just want the max
         #cord_list = sorted(cord_list, key=lambda v: np.sqrt(pow((v[0] - [160]), 2) + pow((v[1] - [160]), 2)))
-        cord_closest = min(cord_list,key=lambda v:np.sqrt(pow((v[0] - [160]), 2) + pow((v[1] - [160]), 2)))
-        mouse_move(cord_list[0][0], cord_list[0][1], cord_list[0][2], cord_list[0][3])
+        cord_closest = min(cord_list,key=lambda v:np.sqrt(pow((v[0] - 160), 2) + pow((v[1] - 160), 2)))
+        print(cord_closest)
+        #mouse_move(cord_list[0][0], cord_list[0][1], cord_list[0][2], cord_list[0][3])
 
 
                  # Draw framerate in corner of frame
