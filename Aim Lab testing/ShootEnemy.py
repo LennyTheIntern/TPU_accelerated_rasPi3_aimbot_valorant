@@ -6,7 +6,7 @@
 # This prgramm will take video input and use the tensorflow modal specified to detect a 'person'
 # and then check to see if the 'person' has a purple outline. if the detected person does have a purple outline
 # than the prgramm will send information to an arduino over I2c that runs the code found at my git hub
-# This code is based off the TensorFlow Lite image classification example at:
+# This code is loosly based off the TensorFlow Lite image classification example at:
 # https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/examples/python/label_image.py
 #
 # I added my own method of drawing boxes and labels using OpenCV.
