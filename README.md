@@ -1,4 +1,5 @@
 TPU accelerated Rasperrypi Aimbot
+For More explination of this project watch: https://www.youtube.com/watch?v=QpvwjC1_Luo
 
 This project was made to expose that an object detection aimbot can run on a raspberry pi.
 
@@ -14,6 +15,5 @@ For this project you will need and arduino micro, a google coral edge TPU a rasp
 
 ![image](https://user-images.githubusercontent.com/84061212/128445781-20273b06-7070-4073-a00b-309a82efd0be.png)
 
-For More explination of this project watch:
-https://www.youtube.com/watch?v=QpvwjC1_Luo
+
 
