@@ -1,5 +1,5 @@
 TPU accelerated Rasperrypi Aimbot
-For More explination of this project watch: https://www.youtube.com/watch?v=QpvwjC1_Luo
+For More explination on this project watch: https://www.youtube.com/watch?v=QpvwjC1_Luo
 
 This project was made to expose that an object detection aimbot can run on a raspberry pi.
 
