@@ -3,8 +3,16 @@ For More explination on this project watch: https://www.youtube.com/watch?v=Qpvw
 
 This project was made to expose that an object detection aimbot can run on a raspberry pi.
 
-program that runs tflite modal is Aim Lab Testing/ShootEnemy.py
+to get tfobject detection to work on Raspi follow this guide
+https://github.com/EdjeElectronics/TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi/blob/master/Raspberry_Pi_Guide.md
+
+then run this file inside of the environment above Testing/ShootEnemy.py
+
+you will need a Arduino leonard to run the .ino sketch
+
+if you want to quantize a tf2 modal use
 script for quantizing Modals for tpu eceleration is in Quant_Script.ipynb
+
 
 Note that I will not be sharing any modals that I end up training for this project, becuse I do not want them to be used to cheat. I have provide the script that I used
 to quantize the Tensor Flow graphs becuse it has alot of other uses beyond this aimbot.
