@@ -1,5 +1,4 @@
 TPU accelerated Rasperrypi Aimbot
-For More explination on this project watch: https://www.youtube.com/watch?v=QpvwjC1_Luo
 
 This project was made to expose that an object detection aimbot can run on a raspberry pi.
 
@@ -8,7 +7,7 @@ https://github.com/EdjeElectronics/TensorFlow-Lite-Object-Detection-on-Android-a
 
 then run this file inside of the environment above Testing/ShootEnemy.py
 
-you will need a Arduino leonard to run the .ino sketch
+you will need a Arduino leonardo to run the .ino sketch
 
 if you want to quantize a tf2 modal use
 script for quantizing Modals for tpu eceleration is in Quant_Script.ipynb
